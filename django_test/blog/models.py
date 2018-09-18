@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+test_variable = 100
 
 class Post(models.Model):
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
