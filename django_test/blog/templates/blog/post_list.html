@@ -1,33 +1,18 @@
 <html>
     <head>
-        <title>Max's blog</title>
+        <title>Test simple text form</title>
     </head>
     <body>
-        <div>
-            <h1><a href="/">Max's Blog</a></h1>
-        </div>
-
-        <div>
-            <p>published: 12.09.2018, 06:45</p>
-            <h2><a href="">My first post</a></h2>
-            <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-        </div>
-
-        <div>
-            <p>published: 12.09.2018, 06:46</p>
-            <h2><a href="">My second post</a></h2>
-            <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut f.</p>
-        </div>
+        <form action="" method="post">
+          {% csrf_token %}
+          <label for="your_name">Enter text: </label>
+          <input id="your_name" type="text" name="your_name" value={{ test_data }}>
+          <input type="submit" value="OK">
+        </form>
 
         {% block content %}
-        {% for post in posts %}
-            <div>
-                <p>published: {{ post.published_date }}</p>
-                <h1><a href="">{{ post.title }}</a></h1>
-                <p>{{ post.text|linebreaksbr }}</p>
-            </div>
-        {% endfor %}
         <p>{{test_data}}</p>
         {% endblock %}
+
     </body>
 </html>
