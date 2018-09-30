@@ -12,6 +12,11 @@
       {% block content %}
       {% csrf_token %}
       <p>{{ret_code}}</p>
+
+      {% for point in route %}
+      <p>{{ point}}</p>
+      {% endfor %}
+
       {% endblock %}
     </body>
 </html>
