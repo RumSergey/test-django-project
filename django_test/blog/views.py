@@ -5,6 +5,9 @@ from .models import Post
 from pyroutelib3 import Router
 router = Router("foot")
 
+center_phi = (56.8874 + 56.8843) * 0.5
+center_lambda = (35.8652 + 35.8819) * 0.5
+
 
 class NameForm(forms.Form):
     begin_phi = forms.FloatField(
@@ -27,6 +30,10 @@ def post_list(request):
     if request.method == 'POST':
         form = NameForm(request.POST)
         if form.is_valid():
+
+            center_phi = (form.cleaned_data['begin_phi'] + form.cleaned_data['end_phi']) * 0.5
+            center_lambda = (form.cleaned_data['begin_lambda'] + form.cleaned_data['end_lambda']) * 0.5
+
             start = router.findNode(
                 form.cleaned_data['begin_phi'], form.cleaned_data['begin_lambda'])
             end = router.findNode(
@@ -44,4 +51,4 @@ def post_list(request):
     else:
         form = NameForm()
 
-    return render(request, 'blog/post_list.html', {'ret_code': ret_code, 'form': form, 'route': routeLatLons})
+    return render(request, 'blog/post_list.html', {'ret_code': ret_code, 'form': form, 'route': routeLatLons, 'center_phi': center_phi,'center_lambda': center_lambda })

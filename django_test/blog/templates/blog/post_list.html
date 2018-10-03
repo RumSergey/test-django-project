@@ -1,6 +1,8 @@
 <html>
     <head>
         <title>Test simple text form</title>
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
     </head>
     <body>
       <form action="" method="post">
@@ -17,6 +19,14 @@
       <p>{{ point}}</p>
       {% endfor %}
 
-      {% endblock %}
+      <div id='map' style='width: 400px; height: 300px;'></div>
+        <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicnVtc2VyZ2V5IiwiYSI6ImNqbHEydmt0dDJiOWEzcG1uNXQ0cHp1bDUifQ.OzWYxcEQ19BybTsO2VYOSA';
+        var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v10'
+        });
+        </script>
+        {% endblock %}
     </body>
 </html>
