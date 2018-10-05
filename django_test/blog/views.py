@@ -5,10 +5,6 @@ from .models import Post
 from pyroutelib3 import Router
 router = Router("foot")
 
-center_phi = (56.8874 + 56.8843) * 0.5
-center_lambda = (35.8652 + 35.8819) * 0.5
-
-
 class NameForm(forms.Form):
     begin_phi = forms.FloatField(
         initial=56.8874, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'begin_phi', 'step': "0.0001"}))
@@ -26,6 +22,9 @@ def post_list(request):
     ret_code = 'none'
 
     routeLatLons = list()
+    center_phi = (56.8874 + 56.8843) * 0.5
+    center_lambda = (35.8652 + 35.8819) * 0.5
+
 
     if request.method == 'POST':
         form = NameForm(request.POST)
