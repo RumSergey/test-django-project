@@ -3,6 +3,8 @@ from django.utils import timezone
 from django import forms
 from .models import Post
 from pyroutelib3 import Router
+from .mapbox_token import *
+
 router = Router("foot")
 
 class NameForm(forms.Form):
@@ -25,6 +27,7 @@ def post_list(request):
     center_phi = (56.8874 + 56.8843) * 0.5
     center_lambda = (35.8652 + 35.8819) * 0.5
 
+    token = get_token()
 
     if request.method == 'POST':
         form = NameForm(request.POST)
@@ -50,4 +53,4 @@ def post_list(request):
     else:
         form = NameForm()
 
-    return render(request, 'blog/post_list.html', {'ret_code': ret_code, 'form': form, 'route': routeLatLons, 'center_phi': center_phi,'center_lambda': center_lambda })
+    return render(request, 'blog/post_list.html', {'ret_code': ret_code, 'form': form, 'route': routeLatLons, 'center_phi': center_phi,'center_lambda': center_lambda, 'mapbox_access_token':token  })

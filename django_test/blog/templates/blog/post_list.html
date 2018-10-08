@@ -11,22 +11,63 @@
         <input type="submit" value="Отправить">
       </form>
 
+
       {% block content %}
       {% csrf_token %}
       <p>{{ret_code}}</p>
 
-      {% for point in route %}
-      <p>{{ point}}</p>
-      {% endfor %}
 
-      <div id='map' style='width: 400px; height: 300px;'></div>
+
+      <div id='map' style='width: 1600px; height: 1000px;'></div>
         <script>
-        mapboxgl.accessToken = {{ mapbox_access_token }};
+        mapboxgl.accessToken = '{{ mapbox_access_token }}';
         var map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v10'
+        style: 'mapbox://styles/mapbox/streets-v10',
+        {% load l10n %}
+        {% localize off %}
+        center: [{{ center_lambda|unlocalize }},{{ center_phi|unlocalize }}],
+        {% endlocalize %}
+        zoom : 15,
+        pitch: 50
         });
-        </script>
-        {% endblock %}
+
+        map.on('load', function () {
+
+    map.addLayer({
+        "id": "route",
+        "type": "line",
+        "source": {
+            "type": "geojson",
+            "data": {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                    {% for point in route %}
+                    {% localize off %}
+                    [{{ point.1|unlocalize}},{{ point.0|unlocalize}}],
+                    {% endlocalize %}
+                    {% endfor %}
+
+
+                    ]
+                }
+            }
+        },
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#888",
+            "line-width": 6
+        }
+    });
+});
+
+       </script>
+      {% endblock %}
     </body>
 </html>
