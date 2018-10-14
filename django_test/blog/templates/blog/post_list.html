@@ -18,19 +18,25 @@
 
 
 
-      <div id='map' style='width: 1600px; height: 1000px;'></div>
+      <div id='map' style='width: 800px; height: 600px;'></div>
         <script>
         mapboxgl.accessToken = '{{ mapbox_access_token }}';
         var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v10',
-        {% load l10n %}
-        {% localize off %}
-        center: [{{ center_lambda|unlocalize }},{{ center_phi|unlocalize }}],
-        {% endlocalize %}
-        zoom : 15,
         pitch: 50
         });
+
+         {% load l10n %}
+        map.fitBounds([[
+        {% localize off %}
+        {{ bound_min_la|unlocalize }},
+        {{ bound_min_phi|unlocalize }}
+    ], [
+        {{ bound_max_la|unlocalize }},
+        {{ bound_max_phi|unlocalize }}
+        {% endlocalize %}
+    ]]);
 
         map.on('load', function () {
 
@@ -61,7 +67,7 @@
             "line-cap": "round"
         },
         "paint": {
-            "line-color": "#888",
+            "line-color": "rgba(255, 0, 0, 0.5)",
             "line-width": 6
         }
     });
