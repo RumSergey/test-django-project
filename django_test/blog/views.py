@@ -5,17 +5,27 @@ from .models import Post
 from pyroutelib3 import Router
 from .mapbox_token import *
 
-router = Router("car")
+
+techlist = (
+            ('car', 'Автомобиль'),
+            ('cycle', 'Велосипед'),
+            ('foot', 'Пешком'),
+            ('horse', 'Лошадь'),
+            ('tram', 'Трамвай'),
+            ('train', 'Поезд')
+        )
 
 class NameForm(forms.Form):
-    begin_phi = forms.FloatField(
+    begin_phi = forms.FloatField(label="Начальная точка, широта",
         initial=56.8874, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'begin_phi', 'step': "0.0001"}))
-    begin_lambda = forms.FloatField(
+    begin_lambda = forms.FloatField(label="Начальная точка, долгота",
         initial=35.8652, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'begin_lambda', 'step': "0.0001"}))
-    end_phi = forms.FloatField(
+    end_phi = forms.FloatField(label="Конечная точка, широта",
         initial=56.8843, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'end_phi', 'step': "0.0001"}))
-    end_lambda = forms.FloatField(
+    end_lambda = forms.FloatField(label="Конечная точка, долгота",
         initial=35.8819, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'end_lambda', 'step': "0.0001"}))
+    wheel_val = forms.ChoiceField(choices=techlist,label="Вид транспорта", initial='car', required=True, widget=forms.Select(attrs={'id': 'wheel_val'}))
+
 
 
 def post_list(request):
@@ -43,6 +53,9 @@ def post_list(request):
 
             bound_min_phi = form.cleaned_data['begin_phi']
             bound_max_phi = form.cleaned_data['end_phi']
+            transport = form.cleaned_data['wheel_val']
+
+            router = Router(transport)
 
             if bound_min_phi > bound_max_phi:
                 temp = bound_min_phi
@@ -77,7 +90,8 @@ def post_list(request):
                     if point[1] < bound_min_la :
                         bound_min_la = point[1]
 
-                ret_code = 'success'
+                #ret_code = 'success'
+                ret_code = transport
             else:
                 ret_code = status
 
@@ -86,6 +100,7 @@ def post_list(request):
             #ret_code =  form.cleaned_data['begin_lambda'] +  form.cleaned_data['begin_phi'] +  form.cleaned_data['end_lambda'] + form.cleaned_data['end_phi']
     else:
         form = NameForm()
+        ret_code = 'not valid form'
 
     return render(request, 'blog/post_list.html', {'ret_code': ret_code, \
 'form': form, 'route': routeLatLons, \
