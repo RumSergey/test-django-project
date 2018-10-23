@@ -6,7 +6,8 @@ from pyroutelib3 import Router
 from .mapbox_token import *
 
 
-techlist = (
+class NameForm(forms.Form):
+    techlist = (
             ('car', 'Автомобиль'),
             ('cycle', 'Велосипед'),
             ('foot', 'Пешком'),
@@ -15,7 +16,7 @@ techlist = (
             ('train', 'Поезд')
         )
 
-class NameForm(forms.Form):
+
     begin_phi = forms.FloatField(label="Начальная точка, широта",
         initial=56.8874, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'begin_phi', 'step': "0.0001"}))
     begin_lambda = forms.FloatField(label="Начальная точка, долгота",
@@ -91,16 +92,16 @@ def post_list(request):
                         bound_min_la = point[1]
 
                 #ret_code = 'success'
-                ret_code = transport
+                ret_code = 'Маршрут построен'
             else:
-                ret_code = status
+                ret_code = 'Маршрут не построен'
 
-
-
-            #ret_code =  form.cleaned_data['begin_lambda'] +  form.cleaned_data['begin_phi'] +  form.cleaned_data['end_lambda'] + form.cleaned_data['end_phi']
+    elif request.method == 'GET':
+        form = NameForm()
+        ret_code = 'Введите данные'
     else:
         form = NameForm()
-        ret_code = 'not valid form'
+        ret_code = 'Неправильный http-запрос'
 
     return render(request, 'blog/post_list.html', {'ret_code': ret_code, \
 'form': form, 'route': routeLatLons, \

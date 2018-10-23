@@ -5,18 +5,25 @@
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
     </head>
     <body>
+    {% csrf_token %}
+      <p><b>{{ret_code}}</b></p>
       <form action="" method="post">
         {% csrf_token %}
         {{ form }}
-        <input type="submit" value="Отправить">
+
+        <input type="submit" value="Построить маршрут">
       </form>
 
 
       {% block content %}
-      {% csrf_token %}
-      <p>{{ret_code}}</p>
-
-
+<p><b><label class="switch">
+        <input type="checkbox" id='first_point'>
+        <label for="first_point">Установить начальную точку</label>
+        <span class="slider round"></span>
+        <input type="checkbox" id='end_point'>
+        <label for="end_point">Установить конечную точку</label>
+        <span class="slider round"></span>
+        </label></b></p>
 
       <div id='map' style='width: 800px; height: 600px;'></div>
         <script>
@@ -24,7 +31,7 @@
         var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v10',
-        pitch: 50
+        pitch: 0
         });
 
          {% load l10n %}
@@ -56,8 +63,6 @@
                     [{{ point.1|unlocalize}},{{ point.0|unlocalize}}],
                     {% endlocalize %}
                     {% endfor %}
-
-
                     ]
                 }
             }
@@ -71,7 +76,24 @@
             "line-width": 6
         }
     });
+    map.on('click', function(e) {
+
+    if (document.getElementById('first_point').checked)
+    {
+        document.getElementById('begin_phi').value = (e.lngLat.lat).toFixed(4);
+        document.getElementById('begin_lambda').value = (e.lngLat.lng).toFixed(4);
+    }
+
+    if (document.getElementById('end_point').checked)
+    {
+        document.getElementById('end_phi').value = (e.lngLat.lat).toFixed(4);
+	    document.getElementById('end_lambda').value = (e.lngLat.lng).toFixed(4);
+    }
+
+    });
 });
+
+
 
        </script>
       {% endblock %}
