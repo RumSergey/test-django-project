@@ -4,6 +4,7 @@ from django import forms
 from .models import Post
 from pyroutelib3 import Router
 from .mapbox_token import *
+import time
 
 
 class NameForm(forms.Form):
@@ -76,6 +77,7 @@ def post_list(request):
             end = router.findNode(
                 form.cleaned_data['end_phi'],  form.cleaned_data['end_lambda'])
 
+            start_time = time.time()
             status, route = router.doRoute(start, end)
             if status == 'success':
                 # Get actual route coordinates
@@ -92,7 +94,7 @@ def post_list(request):
                         bound_min_la = point[1]
 
                 #ret_code = 'success'
-                ret_code = 'Маршрут построен'
+                ret_code = 'Маршрут построен, ' +  "{0:.2f}".format(time.time() - start_time) + ' сек'
             else:
                 ret_code = 'Маршрут не построен'
 
