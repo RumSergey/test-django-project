@@ -73,16 +73,16 @@
             },
             "paint": {
                 "line-color": "rgba(255, 0, 0, 0.5)",
-                "line-width": 6
+                "line-width": 3
             }
         });
 
         {% load static %}
         map.loadImage( '{% static "django_test/1.png" %}', function(error, image) {
             if (error) throw error;
-            map.addImage('cat', image);
+            map.addImage('beg_image', image);
             map.addLayer({
-                "id": "points",
+                "id": "beg_points",
                 "type": "symbol",
                 "source": {
                     "type": "geojson",
@@ -93,17 +93,45 @@
                             "geometry": {
                                 "type": "Point",
                                 "coordinates": [
-                                     {% localize off %}
-                                     {{ bound_min_la|unlocalize }}, {{ bound_min_phi|unlocalize }}
-                                     {% endlocalize %}
+                                    document.getElementById('begin_lambda').value,
+                                    document.getElementById('begin_phi').value
                                 ]
                             }
                         }]
                     }
                 },
                 "layout": {
-                    "icon-image": "cat",
-                    "icon-size": 0.25
+                    "icon-image": "beg_image",
+                    "icon-size": 1.0
+                }
+            });
+        });
+
+        map.loadImage( '{% static "django_test/2.png" %}', function(error, image) {
+            if (error) throw error;
+            map.addImage('end_image', image);
+            map.addLayer({
+                "id": "end_points",
+                "type": "symbol",
+                "source": {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": [{
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    document.getElementById('end_lambda').value,
+                                    document.getElementById('end_phi').value
+                                ]
+                            }
+                        }]
+                    }
+                },
+                "layout": {
+                    "icon-image": "end_image",
+                    "icon-size": 1.0
                 }
             });
         });
