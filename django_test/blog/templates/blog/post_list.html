@@ -10,13 +10,12 @@
       <form action="" method="post">
         {% csrf_token %}
         {{ form }}
-
         <input type="submit" value="Построить маршрут">
       </form>
 
 
       {% block content %}
-<p><b><label class="switch">
+        <p><b><label class="switch">
         <input type="checkbox" id='first_point'>
         <label for="first_point">Установить начальную точку</label>
         <span class="slider round"></span>
@@ -25,77 +24,106 @@
         <span class="slider round"></span>
         </label></b></p>
 
-      <div id='map' style='width: 800px; height: 600px;'></div>
+<div id='map' style='width: 800px; height: 600px;'></div>
         <script>
         mapboxgl.accessToken = '{{ mapbox_access_token }}';
+
         var map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v10',
-        pitch: 0
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v10',
+            pitch: 0
         });
 
-         {% load l10n %}
+        {% load l10n %}
         map.fitBounds([[
-        {% localize off %}
-        {{ bound_min_la|unlocalize }},
-        {{ bound_min_phi|unlocalize }}
-    ], [
-        {{ bound_max_la|unlocalize }},
-        {{ bound_max_phi|unlocalize }}
-        {% endlocalize %}
-    ]]);
+            {% localize off %}
+            {{ bound_min_la|unlocalize }},
+            {{ bound_min_phi|unlocalize }}
+            ], [
+            {{ bound_max_la|unlocalize }},
+            {{ bound_max_phi|unlocalize }}
+            {% endlocalize %}
+        ]]);
 
-        map.on('load', function () {
+    map.on('load', function () {
 
-    map.addLayer({
-        "id": "route",
-        "type": "line",
-        "source": {
-            "type": "geojson",
-            "data": {
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": [
-                    {% for point in route %}
-                    {% localize off %}
-                    [{{ point.1|unlocalize}},{{ point.0|unlocalize}}],
-                    {% endlocalize %}
-                    {% endfor %}
-                    ]
+        map.addLayer({
+            "id": "route",
+            "type": "line",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                        {% for point in route %}
+                        {% localize off %}
+                            [{{ point.1|unlocalize}},{{ point.0|unlocalize}}],
+                        {% endlocalize %}
+                        {% endfor %}
+                        ]
+                    }
                 }
+            },
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": "rgba(255, 0, 0, 0.5)",
+                "line-width": 6
             }
-        },
-        "layout": {
-            "line-join": "round",
-            "line-cap": "round"
-        },
-        "paint": {
-            "line-color": "rgba(255, 0, 0, 0.5)",
-            "line-width": 6
-        }
+        });
+
+        {% load static %}
+        map.loadImage( '{% static "django_test/1.png" %}', function(error, image) {
+            if (error) throw error;
+            map.addImage('cat', image);
+            map.addLayer({
+                "id": "points",
+                "type": "symbol",
+                "source": {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": [{
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                     {% localize off %}
+                                     {{ bound_min_la|unlocalize }}, {{ bound_min_phi|unlocalize }}
+                                     {% endlocalize %}
+                                ]
+                            }
+                        }]
+                    }
+                },
+                "layout": {
+                    "icon-image": "cat",
+                    "icon-size": 0.25
+                }
+            });
+        });
+
+        map.on('click', function(e) {
+            if (document.getElementById('first_point').checked)
+            {
+                document.getElementById('begin_phi').value = (e.lngLat.lat).toFixed(4);
+                document.getElementById('begin_lambda').value = (e.lngLat.lng).toFixed(4);
+            }
+
+            if (document.getElementById('end_point').checked)
+            {
+                document.getElementById('end_phi').value = (e.lngLat.lat).toFixed(4);
+	           document.getElementById('end_lambda').value = (e.lngLat.lng).toFixed(4);
+            }
+        });
     });
-    map.on('click', function(e) {
 
-    if (document.getElementById('first_point').checked)
-    {
-        document.getElementById('begin_phi').value = (e.lngLat.lat).toFixed(4);
-        document.getElementById('begin_lambda').value = (e.lngLat.lng).toFixed(4);
-    }
-
-    if (document.getElementById('end_point').checked)
-    {
-        document.getElementById('end_phi').value = (e.lngLat.lat).toFixed(4);
-	    document.getElementById('end_lambda').value = (e.lngLat.lng).toFixed(4);
-    }
-
-    });
-});
-
-
-
-       </script>
+    </script>
       {% endblock %}
     </body>
 </html>
