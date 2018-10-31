@@ -10,7 +10,7 @@
       <form action="" method="post">
         {% csrf_token %}
         {{ form }}
-        <input type="submit" value="Построить маршрут">
+        <p><input id="button_submit" type="submit" value="Построить маршрут"></p>
       </form>
 
 
@@ -28,11 +28,83 @@
         <script>
         mapboxgl.accessToken = '{{ mapbox_access_token }}';
 
+    var geojson_beg = {
+        "type": "FeatureCollection",
+        "features": [{
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [0, 0]
+            }
+        }]
+    };
+
+    var geojson_end = {
+        "type": "FeatureCollection",
+        "features": [{
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [0, 0]
+            }
+        }]
+    };
+
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v10',
             pitch: 0
         });
+
+        var canvas = map.getCanvasContainer();
+
+        function onMovePointBeg(e) {
+            var coords = e.lngLat;
+
+            // Set a UI indicator for dragging.
+            canvas.style.cursor = 'grabbing';
+
+            document.getElementById('begin_phi').value = (e.lngLat.lat).toFixed(4);
+            document.getElementById('begin_lambda').value = (e.lngLat.lng).toFixed(4);
+            geojson_beg.features[0].geometry.coordinates = [document.getElementById('begin_lambda').value, document.getElementById('begin_phi').value];
+            map.getSource('beg_point_source').setData(geojson_beg);
+            document.getElementById('button_submit').value = 'Перестроить маршрут'
+        }
+
+        function onUpPointBeg(e) {
+            var coords = e.lngLat;
+
+            // Print the coordinates of where the point had
+            // finished being dragged to on the map.
+            canvas.style.cursor = '';
+
+            // Unbind mouse/touch events
+            map.off('mousemove', onMovePointBeg);
+        }
+
+        function onMovePointEnd(e) {
+            var coords = e.lngLat;
+
+            // Set a UI indicator for dragging.
+            canvas.style.cursor = 'grabbing';
+
+            document.getElementById('end_phi').value = (e.lngLat.lat).toFixed(4);
+            document.getElementById('end_lambda').value = (e.lngLat.lng).toFixed(4);
+            geojson_end.features[0].geometry.coordinates = [document.getElementById('end_lambda').value, document.getElementById('end_phi').value];
+            map.getSource('end_point_source').setData(geojson_end);
+            document.getElementById('button_submit').value = 'Перестроить маршрут'
+        }
+
+        function onUpPointEnd(e) {
+            var coords = e.lngLat;
+
+            // Print the coordinates of where the point had
+            // finished being dragged to on the map.
+            canvas.style.cursor = '';
+
+            // Unbind mouse/touch events
+            map.off('mousemove', onMovePointEnd);
+        }
 
         {% load l10n %}
         map.fitBounds([[
@@ -46,6 +118,22 @@
         ]]);
 
     map.on('load', function () {
+
+     map.addSource('beg_point_source', {
+        "type": "geojson",
+        "data": geojson_beg
+    });
+
+    map.addSource('end_point_source', {
+        "type": "geojson",
+        "data": geojson_end
+    });
+
+    geojson_beg.features[0].geometry.coordinates = [document.getElementById('begin_lambda').value, document.getElementById('begin_phi').value];
+    map.getSource('beg_point_source').setData(geojson_beg);
+
+    geojson_end.features[0].geometry.coordinates = [document.getElementById('end_lambda').value, document.getElementById('end_phi').value];
+    map.getSource('end_point_source').setData(geojson_end);
 
         map.addLayer({
             "id": "route",
@@ -84,22 +172,7 @@
             map.addLayer({
                 "id": "beg_points",
                 "type": "symbol",
-                "source": {
-                    "type": "geojson",
-                    "data": {
-                        "type": "FeatureCollection",
-                        "features": [{
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [
-                                    document.getElementById('begin_lambda').value,
-                                    document.getElementById('begin_phi').value
-                                ]
-                            }
-                        }]
-                    }
-                },
+                "source": "beg_point_source",
                 "layout": {
                     "icon-image": "beg_image",
                     "icon-size": 1.0
@@ -113,22 +186,7 @@
             map.addLayer({
                 "id": "end_points",
                 "type": "symbol",
-                "source": {
-                    "type": "geojson",
-                    "data": {
-                        "type": "FeatureCollection",
-                        "features": [{
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [
-                                    document.getElementById('end_lambda').value,
-                                    document.getElementById('end_phi').value
-                                ]
-                            }
-                        }]
-                    }
-                },
+                "source": "end_point_source",
                 "layout": {
                     "icon-image": "end_image",
                     "icon-size": 1.0
@@ -136,17 +194,67 @@
             });
         });
 
+
+         // When the cursor enters a feature in the point layer, prepare for dragging.
+        map.on('mouseenter', 'beg_points', function() {
+            //map.setPaintProperty('point', 'circle-color', '#3bb2d0');
+            canvas.style.cursor = 'move';
+        });
+
+        map.on('mouseleave', 'beg_points', function() {
+            //map.setPaintProperty('point', 'circle-color', '#3887be');
+            canvas.style.cursor = '';
+        });
+
+        map.on('mousedown', 'beg_points', function(e) {
+            // Prevent the default map drag behavior.
+            e.preventDefault();
+
+            canvas.style.cursor = 'grab';
+
+            map.on('mousemove', onMovePointBeg);
+            map.once('mouseup', onUpPointBeg);
+        });
+
+
+        // When the cursor enters a feature in the point layer, prepare for dragging.
+        map.on('mouseenter', 'end_points', function() {
+            //map.setPaintProperty('point', 'circle-color', '#3bb2d0');
+            canvas.style.cursor = 'move';
+        });
+
+        map.on('mouseleave', 'end_points', function() {
+            //map.setPaintProperty('point', 'circle-color', '#3887be');
+            canvas.style.cursor = '';
+        });
+
+        map.on('mousedown', 'end_points', function(e) {
+            // Prevent the default map drag behavior.
+            e.preventDefault();
+
+            canvas.style.cursor = 'grab';
+
+            map.on('mousemove', onMovePointEnd);
+            map.once('mouseup', onUpPointEnd);
+        });
+
         map.on('click', function(e) {
             if (document.getElementById('first_point').checked)
             {
                 document.getElementById('begin_phi').value = (e.lngLat.lat).toFixed(4);
                 document.getElementById('begin_lambda').value = (e.lngLat.lng).toFixed(4);
+                geojson_beg.features[0].geometry.coordinates = [document.getElementById('begin_lambda').value, document.getElementById('begin_phi').value];
+                map.getSource('beg_point_source').setData(geojson_beg);
+                document.getElementById('button_submit').value = 'Перестроить маршрут'
             }
 
             if (document.getElementById('end_point').checked)
             {
                 document.getElementById('end_phi').value = (e.lngLat.lat).toFixed(4);
 	           document.getElementById('end_lambda').value = (e.lngLat.lng).toFixed(4);
+               geojson_end.features[0].geometry.coordinates = [document.getElementById('end_lambda').value, document.getElementById('end_phi').value];
+               map.getSource('end_point_source').setData(geojson_end);
+               document.getElementById('button_submit').value = 'Перестроить маршрут'
             }
         });
     });
