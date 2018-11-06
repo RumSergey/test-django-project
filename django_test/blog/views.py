@@ -94,19 +94,19 @@ def post_list(request):
                         bound_min_la = point[1]
 
                 #ret_code = 'success'
-                ret_code = 'Маршрут построен, ' +  "{0:.2f}".format(time.time() - start_time) + ' сек'
+                ret_code = 'маршрут построен, ' +  "{0:.2f}".format(time.time() - start_time) + ' сек'
             else:
                 if ret_code == 'none':
-                    ret_code = 'Маршрут отсутствует'
+                    ret_code = 'маршрут отсутствует'
                 else:
-                    ret_code = 'Маршрут не построен'
+                    ret_code = 'маршрут не построен'
 
     elif request.method == 'GET':
         form = NameForm()
-        ret_code = 'Введите данные'
+        ret_code = 'ввод данных'
     else:
         form = NameForm()
-        ret_code = 'Неправильный http-запрос'
+        ret_code = 'неправильный http-запрос'
 
     return render(request, 'blog/post_list.html', {'ret_code': ret_code, \
 'form': form, 'route': routeLatLons, \

@@ -5,26 +5,8 @@
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
     </head>
     <body>
-    {% csrf_token %}
-      <p><b>{{ret_code}}</b></p>
-      <form action="" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <p><input id="button_submit" type="submit" value="Построить маршрут"></p>
-      </form>
-
-
       {% block content %}
-        <p><b><label class="switch">
-        <input type="radio" id='first_point' name='point_type' value='first' checked>
-        <label for="first_point">Установить начальную точку</label>
-        <span class="slider round"></span>
-        <input type="radio" id='end_point' name='point_type' value='end'>
-        <label for="end_point">Установить конечную точку</label>
-        <span class="slider round"></span>
-        </label></b></p>
-
-<div id='map' style='width: 800px; height: 600px;'></div>
+<div id='map' style='width: 100%; height: 95%;position:absolute; top: 0; left: 0;'></div>
         <script>
         mapboxgl.accessToken = '{{ mapbox_access_token }}';
 
@@ -260,6 +242,31 @@
     });
 
     </script>
+
+    <div id='chec' style='width: 100%; height: 50px; position:absolute; top: 10; left: 10;'>
+     <label class="switch" value="По клику">
+        <label>                  Установить</label>
+        <input type="radio" id='first_point' name='point_type' value='first' checked>
+        <label for="first_point">начальную точку</label>
+        <span class="slider round"></span>
+        <input type="radio" id='end_point' name='point_type' value='end'>
+        <label for="end_point">конечную точку</label>
+        <span class="slider round"></span></p>
+        </label>
+</div>
+
+<div id='status' style='width: 100%; height: 50px; position:absolute; top: 90%; left: 0;text-align: center;'>
+<p><b><label>Статус выполнения: </label>{{ret_code}}</b></div>
+
+<div id='foot' style='width: 100%; height: 4%; position:absolute; top: 96%; left: 10;'>
+{% csrf_token %}
+      <form action="" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input id="button_submit" type="submit" value="Построить маршрут">
+      </form>
+      </div>
       {% endblock %}
+
     </body>
 </html>
