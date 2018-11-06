@@ -96,7 +96,10 @@ def post_list(request):
                 #ret_code = 'success'
                 ret_code = 'Маршрут построен, ' +  "{0:.2f}".format(time.time() - start_time) + ' сек'
             else:
-                ret_code = 'Маршрут не построен'
+                if ret_code == 'none':
+                    ret_code = 'Маршрут отсутствует'
+                else:
+                    ret_code = 'Маршрут не построен'
 
     elif request.method == 'GET':
         form = NameForm()
