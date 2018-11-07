@@ -5,6 +5,7 @@ from .models import Post
 from pyroutelib3 import Router
 from .mapbox_token import *
 import time
+from math import radians, sin, cos, acos
 
 
 class NameForm(forms.Form):
@@ -82,8 +83,25 @@ def post_list(request):
             if status == 'success':
                 # Get actual route coordinates
                 routeLatLons = list(map(router.nodeLatLon, route))
-
+                temp_phi = 0
+                temp_la = 0
+                sum_length = 0
                 for point in routeLatLons:
+                    if point == routeLatLons[0]:
+                        temp_phi = point[0]
+                        temp_la = point[1]
+                    else:
+                        slat = radians(temp_phi)
+                        slon = radians(temp_la)
+                        elat = radians(point[0])
+                        elon = radians(point[1])
+
+                        dist = 6371.01 * acos(sin(slat)*sin(elat) + cos(slat)*cos(elat)*cos(slon - elon))
+                        sum_length = sum_length + dist
+                        temp_phi = point[0]
+                        temp_la = point[1]
+
+
                     if point[0] > bound_max_phi :
                         bound_max_phi = point[0]
                     if point[0] < bound_min_phi :
@@ -94,7 +112,7 @@ def post_list(request):
                         bound_min_la = point[1]
 
                 #ret_code = 'success'
-                ret_code = 'маршрут построен, ' +  "{0:.2f}".format(time.time() - start_time) + ' сек'
+                ret_code = 'маршрут построен, длина ' +  "{0:.2f}".format(sum_length)  + ' км, время расчёта ' + "{0:.2f}".format(time.time() - start_time) + ' сек'
             else:
                 if ret_code == 'none':
                     ret_code = 'маршрут отсутствует'
