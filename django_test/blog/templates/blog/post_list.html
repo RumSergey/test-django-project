@@ -243,9 +243,9 @@
 
     </script>
 
-    <div id='chec' style='width: 100%; height: 50px; position:absolute; top: 10; left: 10;'>
+    <div id='chec' style='width: 365px; height: 25px; position:absolute; top: 10; left: 10;background-color: #cccc;padding: 5px 5px 0px 5px;'>
      <label class="switch" value="По клику">
-        <label>                  Установить</label>
+        <label>Установить</label>
         <input type="radio" id='first_point' name='point_type' value='first' checked>
         <label for="first_point">начальную точку</label>
         <span class="slider round"></span>
@@ -255,10 +255,10 @@
         </label>
 </div>
 
-<div id='status' style='width: 100%; height: 50px; position:absolute; top: 90%; left: 0;text-align: center;'>
+<div id='status' style='width: 100%; height: 50px; position:absolute; top: calc(95% - 50px); left: 0;text-align: center;background-color: #fffc;'>
 <p><b><label>Статус выполнения: </label>{{ret_code}}</b></div>
 
-<div id='foot' style='width: 100%; height: 4%; position:absolute; top: 96%; left: 10;'>
+<div id='foot' style='width: 100%; height: 4%; position:absolute; top: 95%; left: 0px;background-color: #cccc;padding: 10px 5px 0px 5px;'>
 {% csrf_token %}
       <form action="" method="post">
         {% csrf_token %}
