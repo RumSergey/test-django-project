@@ -51,9 +51,6 @@ def post_list(request):
         form = NameForm(request.POST)
         if form.is_valid():
 
-            #center_phi = (form.cleaned_data['begin_phi'] + form.cleaned_data['end_phi']) * 0.5
-            #center_lambda = (form.cleaned_data['begin_lambda'] + form.cleaned_data['end_lambda']) * 0.5
-
             bound_min_phi = form.cleaned_data['begin_phi']
             bound_max_phi = form.cleaned_data['end_phi']
             transport = form.cleaned_data['wheel_val']

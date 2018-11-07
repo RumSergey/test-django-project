@@ -2,11 +2,17 @@
     <head>
         <title>Расчёт маршрута</title>
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
+
+        <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+        <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.js'></script>
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
+        <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.css' type='text/css'/>
+
     </head>
     <body>
       {% block content %}
 <div id='map' style='width: 100%; height: 95%;position:absolute; top: 0; left: 0;'></div>
+
         <script>
         mapboxgl.accessToken = '{{ mapbox_access_token }}';
 
@@ -37,6 +43,35 @@
             style: 'mapbox://styles/mapbox/streets-v10',
             pitch: 0
         });
+
+        var draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {
+            polygon: true,
+            trash: true
+            }
+        });
+
+        function updateArea(e) {
+            //document.getElementById('button_submit').value = 'updateArea';
+            document.getElementById('draw_radio').checked = true;
+            var data = draw.getAll();
+            //var answer = document.getElementById('calculated-area');
+            if (data.features.length > 0) {
+                var area = turf.area(data);
+                // restrict to area to 2 decimal points
+                var rounded_area = Math.round(area*100)/100;
+                //answer.innerHTML = '<p><strong>' + rounded_area + '</strong></p><p>square meters</p>';
+            } else {
+                //answer.innerHTML = '';
+                if (e.type !== 'draw.delete') alert("Use the draw tools to draw a polygon!");
+            }
+        }
+
+        function updateDrawSelection(e) {
+            document.getElementById('draw_radio').checked = true;
+            //document.getElementById('button_submit').value = 'updateDrawSelection';
+        }
 
         var canvas = map.getCanvasContainer();
 
@@ -239,18 +274,28 @@
                document.getElementById('button_submit').value = 'Перестроить маршрут'
             }
         });
-    });
 
+        map.addControl(draw);
+
+        map.on('draw.create', updateArea);
+        map.on('draw.delete', updateArea);
+        map.on('draw.update', updateArea);
+        map.on('draw.modechange', updateDrawSelection);
+
+});
     </script>
 
-    <div id='chec' style='width: 365px; height: 25px; position:absolute; top: 10; left: 10;background-color: #cccc;padding: 5px 5px 0px 5px;'>
+    <div id='chec' style='width: 455px; height: 25px; position:absolute; top: 10; left: 10;background-color: #cccc;padding: 5px 5px 0px 5px;'>
      <label class="switch" value="По клику">
-        <label>Установить</label>
+        <label>Установить:</label>
         <input type="radio" id='first_point' name='point_type' value='first' checked>
         <label for="first_point">начальную точку</label>
         <span class="slider round"></span>
         <input type="radio" id='end_point' name='point_type' value='end'>
         <label for="end_point">конечную точку</label>
+        <span class="slider round"></span>
+        <input type="radio" id='draw_radio' name='point_type' value='draw'>
+        <label for="end_point">полигон</label>
         <span class="slider round"></span></p>
         </label>
 </div>
