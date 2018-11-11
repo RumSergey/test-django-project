@@ -22,6 +22,19 @@
         <script>
         mapboxgl.accessToken = '{{ mapbox_access_token }}';
 
+        function onInputChanged() {
+            geojson_beg.features[0].geometry.coordinates = [document.getElementById('begin_lambda').value, document.getElementById('begin_phi').value];
+            map.getSource('beg_point_source').setData(geojson_beg);
+
+            geojson_beg.features[0].geometry.coordinates = [document.getElementById('med_lambda').value, document.getElementById('med_phi').value];
+            map.getSource('med_point_source').setData(geojson_beg);
+
+            geojson_end.features[0].geometry.coordinates = [document.getElementById('end_lambda').value, document.getElementById('end_phi').value];
+            map.getSource('end_point_source').setData(geojson_end);
+
+            document.getElementById('button_submit').value = 'Перестроить маршрут';
+        }
+
     var geojson_beg = {
         "type": "FeatureCollection",
         "features": [{
