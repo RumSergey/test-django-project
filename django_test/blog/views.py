@@ -53,17 +53,17 @@ class NameForm(forms.Form):
         )
 
 
-    begin_phi = forms.FloatField(label="Начальная точка, широта",
+    begin_phi = forms.FloatField(label="Точка выхода, широта",
         initial=56.8874, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'begin_phi', 'step': "0.0001", 'onchange' : "onInputChanged()"}))
-    begin_lambda = forms.FloatField(label="Начальная точка, долгота",
+    begin_lambda = forms.FloatField(label="Точка выхода, долгота",
         initial=35.8652, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'begin_lambda', 'step': "0.0001", 'onchange' : "onInputChanged()"}))
-    med_phi = forms.FloatField(label="Промежуточная точка, широта",
+    med_phi = forms.FloatField(label="Склад, широта",
         initial=56.8856, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'med_phi', 'step': "0.0001", 'onchange' : "onInputChanged()"}))
-    med_lambda = forms.FloatField(label="Промежуточная точка, долгота",
+    med_lambda = forms.FloatField(label="Склад, долгота",
         initial=35.8712, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'med_lambda', 'step': "0.0001", 'onchange' : "onInputChanged()"}))
-    end_phi = forms.FloatField(label="Конечная точка, широта",
+    end_phi = forms.FloatField(label="Точка встречи, широта",
         initial=56.8843, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'end_phi', 'step': "0.0001", 'onchange' : "onInputChanged()"}))
-    end_lambda = forms.FloatField(label="Конечная точка, долгота",
+    end_lambda = forms.FloatField(label="Точка встречи, долгота",
         initial=35.8819, required='True', max_value=90.0, min_value=-90.0,widget=forms.NumberInput(attrs={'id': 'end_lambda', 'step': "0.0001", 'onchange' : "onInputChanged()"}))
     #arrival_time = forms.TimeField(label="Требуемое время прибытия",required='False', widget=forms.TimeInput(format='%H:%M'))
     wheel_val = forms.ChoiceField(choices=techlist,label="Вид транспорта", initial='car', required=True, widget=forms.Select(attrs={'id': 'wheel_val'}))
@@ -154,14 +154,14 @@ def post_list(request):
 
                 #ret_code = 'success'
                 #ret_code = '1-й маршрут построен, ' + 'время в пути ' + "{0:.2f}".format(sum_length / speed_list[transport]) + ' ч, '
-                ret_code = '1-й маршрут построен, время в пути '
+                ret_code = 'маршрут до склада построен, время в пути '
                 time_str = hours_to_time_str(sum_length / speed_list[transport])
                 ret_code = ret_code + time_str
             else:
                 if ret_code == 'none':
-                    ret_code = '1-й маршрут отсутствует, '
+                    ret_code = 'маршрут до склада отсутствует, '
                 else:
-                    ret_code = '1-й маршрут не построен, '
+                    ret_code = 'маршрут до склада не построен, '
 
             status, route = router.doRoute(med, end)
             sum_length2 = 0
@@ -199,19 +199,17 @@ def post_list(request):
                         bound_min_la = point[1]
 
                 #ret_code = 'success'
-                ret_code = ret_code + ', 2-й маршрут построен, время в пути '
+                ret_code = ret_code + ', маршрут до точки встречи построен, время в пути '
                 time_str = hours_to_time_str(sum_length2 / speed_list[transport])
                 ret_code = ret_code + time_str
             else:
                 if ret_code == 'none':
-                    ret_code = '2-й маршрут отсутствует, '
+                    ret_code = 'маршрут до точки встречи отсутствует, '
                 else:
-                    ret_code = '2-й маршрут не построен, '
+                    ret_code = 'маршрут до точки встречи не построен, '
 
             ret_code = ret_code + ', общая длина маршрута ' +  "{0:.2f}".format(sum_length + sum_length2)  + ' км, время расчёта ' + "{0:.2f}".format(time.time() - start_time) + ' сек '
-            hours_to_time_str
-            #print(speed_list[transport])
-            #ret_code = ret_code + ' ,скорость' + "{0:.2f}".format(speed_list[transport])
+
 
     elif request.method == 'GET':
         form = NameForm()

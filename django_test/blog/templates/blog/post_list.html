@@ -422,17 +422,17 @@
 });
     </script>
 
-    <div id='chec' style='width: 635px; height: 25px; position:absolute; top: 10; left: 370;background-color: #cccc;padding: 5px 5px 0px 5px;'>
+    <div id='chec' style='width: 635px; height: 25px; position:absolute; top: 10; left: 370;background-color: #fffc;padding: 5px 5px 0px 5px;'>
      <label class="switch" value="По клику">
         <label>Установить:</label>
         <input type="radio" id='first_point' name='point_type' value='first' checked>
-        <label for="first_point">начальную точку</label>
+        <label for="first_point"><font color="#82ca9c">точку выхода</font></label>
         <span class="slider round"></span>
         <input type="radio" id='med_point' name='point_type' value='med'>
-        <label for="med_point">промежуточную точку</label>
+        <label for="med_point"><font color="#5674b9">склад</font></label>
         <span class="slider round"></span>
         <input type="radio" id='end_point' name='point_type' value='end'>
-        <label for="end_point">конечную точку</label>
+        <label for="end_point"><font color="#f68e56">точку встречи</font></label>
         <span class="slider round"></span>
         <input type="radio" id='draw_radio' name='point_type' value='draw'>
         <label for="end_point">полигон</label>
@@ -441,7 +441,7 @@
 </div>
 
 <div id='status' style='width: calc(100% - 360px); height: 50px; position:absolute; top: calc(100% - 50px); left: 360;text-align: center;background-color: #fffc;'>
-<p><b><label>Статус выполнения: </label>{{ret_code}}</b></div>
+<p><b><label><font size='4'>Статус выполнения: </label>{{ret_code}}</font></b></div>
 
 <div id='foot' style='width: 355px; height: 100%; position:absolute; top: 0px; left: 0px;background-color: #cccc;padding: 10px 0px 5px 5px;'>
 {% csrf_token %}
