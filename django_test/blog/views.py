@@ -122,6 +122,7 @@ def post_list(request):
     posts = Post.objects.filter(
         published_date__lte=timezone.now()).order_by('published_date')
     ret_code = 'none'
+    timing = ''
 
     routeLatLons = list()
     routeLatLonsAdd = list()
@@ -215,14 +216,14 @@ def post_list(request):
 
                 #ret_code = 'success'
                 #ret_code = '1-й маршрут построен, ' + 'время в пути ' + "{0:.2f}".format(sum_length / speed_list[transport]) + ' ч, '
-                #ret_code = 'время в пути до склада '
+                ret_code = 'Результаты расчетов: время в пути до склада '
                 time_str_1 = hours_to_time_str(sum_length / speed_list[transport])
-                #ret_code = ret_code + time_str
+                ret_code = ret_code + time_str_1
             else:
                 if ret_code == 'none':
-                    ret_code = 'маршрут до склада отсутствует, '
+                    ret_code = 'Результаты расчетов: маршрут до склада отсутствует, '
                 else:
-                    ret_code = 'маршрут до склада не построен, '
+                    ret_code = 'Результаты расчетов: маршрут до склада не построен, '
 
             status, route = router.doRoute(med, end)
             sum_length2 = 0
@@ -261,28 +262,28 @@ def post_list(request):
                         bound_min_la = point[1]
 
                 #ret_code = 'success'
-                #ret_code = ret_code + '; время в пути до точки встречи '
+                ret_code = ret_code + '; время в пути до точки встречи '
                 time_str_2 = hours_to_time_str(sum_length2 / speed_list[transport])
-                #ret_code = ret_code + time_str
+                ret_code = ret_code + time_str_2
             else:
                 if ret_code == 'none':
                     ret_code = 'маршрут до точки встречи отсутствует, '
                 else:
                     ret_code = 'маршрут до точки встречи не построен, '
 
-            ret_code = 'общая длина маршрута ' +  "{0:.2f}".format(sum_length + sum_length2)  + ' км'
+            ret_code = ret_code + '; общая длина маршрута ' +  "{0:.2f}".format(sum_length + sum_length2)  + ' км'
             ret_code = ret_code + ', время движения ' +  hours_to_time_str((sum_length + sum_length2) / speed_list[transport])
             #ret_code = ret_code + ' ( ' + time_str_1 + ' до склада, ' + time_str_2 + ' до точки встречи)'
             ret_code = ret_code + time_to_start_str( (sum_length + sum_length2) / speed_list[transport], ar_time_h,ar_time_m)
-            ret_code = ret_code + '; время выполнения расчётов ' + "{0:.2f}".format(time.time() - start_time) + ' сек '
+            timing = 'Время выполнения расчётов: ' + "{0:.2f}".format(time.time() - start_time) + ' сек '
 
 
     elif request.method == 'GET':
         form = NameForm()
-        ret_code = 'ввод данных'
+        ret_code = 'Введите данные'
     else:
         form = NameForm()
-        ret_code = 'неправильный http-запрос'
+        ret_code = 'Неправильный http-запрос'
 
     return render(request, 'blog/post_list.html', {'ret_code': ret_code, \
 'form': form, 'route': routeLatLons, 'routeAdd': routeLatLonsAdd,\
@@ -290,4 +291,5 @@ def post_list(request):
 'bound_max_phi': bound_max_phi + 0.001, \
 'bound_min_la': bound_min_la - 0.001,\
 'bound_max_la': bound_max_la + 0.001, \
+'timing': timing, \
 'mapbox_access_token':token  })
